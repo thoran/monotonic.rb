@@ -1,18 +1,36 @@
-require 'sys-uptime'
+# 20200115
 
-def timer
-  start_time_in_seconds_since_boot = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-  start_time = Sys::Uptime.boot_time + start_time_in_seconds_since_boot
-  yield
-  finish_time_in_seconds_since_boot = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-  elapsed_time_in_seconds = finish_time_in_seconds_since_boot - start_time_in_seconds_since_boot
-  finish_time = start_time + elapsed_time_in_seconds
-  [start_time, finish_time, elapsed_time_in_seconds]
+class MonotonicTimer
+
+  class << self
+
+    def time
+      monotonic_timer = MonotonicTimer.new
+      monotonic_timer.start
+      yield monotonic_timer
+      monotonic_timer.stop
+    end
+
+  end # class << self
+
+  def initialize
+    @total_time = 0
+  end
+
+  def start
+    @start_monotomic_time = MonotonicTime.now
+    @start_time = @start_monotomic_time.to_time
+  end
+
+  def stop
+    @stop_monotonic_time = MonotonicTime.now
+    @finish_time = @stop_monotonic_time.to_time
+    @total_time += (@finish_time - @start_time)
+  end
+
+  def total_time
+    monotonic_time_now = MonotonicTime.now
+    @total_time + (monotonic_time_now.to_time - @start_time)
+  end
+
 end
-
-s, f, e = timer do
-  puts 'code'
-  sleep 3
-end
-
-p s, f, e
