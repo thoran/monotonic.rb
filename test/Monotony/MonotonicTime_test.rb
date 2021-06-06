@@ -1,20 +1,20 @@
-require_relative '../lib/monotonic_time'
+require_relative '../../lib/Monotony/MonotonicTime'
 
 require 'minitest/autorun'
 require 'minitest-spec-context'
 
-describe MonotonicTime do
-  subject{MonotonicTime.now}
+describe Monotony::MonotonicTime do
+  subject{Monotony::MonotonicTime.now}
 
   describe "#initialize" do
     it "the time spent in the block is returned as the value of the block" do
-      expect(subject.instance_variable_get(:@boot_time))\
+      expect(subject.instance_variable_get(:@boot_time)) \
         .must_equal(Sys::Uptime.boot_time)
     end
 
     it "the time spent in the block is returned as the value of the block" do
-      expect(subject.instance_variable_get(:@seconds_since_boot).round(3))\
-        .must_equal(Process.clock_gettime(Process::CLOCK_MONOTONIC).round(3))
+      expect(subject.instance_variable_get(:@seconds_since_boot).round(2)) \
+        .must_equal(Process.clock_gettime(Process::CLOCK_MONOTONIC).round(2))
     end
   end
 

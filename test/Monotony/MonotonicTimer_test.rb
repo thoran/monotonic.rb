@@ -1,19 +1,19 @@
-require_relative '../lib/monotonic_timer'
+require_relative '../../lib/Monotony/MonotonicTimer'
 
 require 'minitest/autorun'
 require 'minitest-spec-context'
 
-describe MonotonicTimer do
+describe Monotony::MonotonicTimer do
   context "with a block" do
     it "the time spent in the block is returned as the value of the block" do
-      block_time = MonotonicTimer.time do |timer|
+      block_time = Monotony::MonotonicTimer.time do |timer|
         sleep 3
       end
       expect(block_time.round).must_equal(3)
     end
 
     it "allows the timer to be started and stopped within the block" do
-      MonotonicTimer.time do |timer|
+      Monotony::MonotonicTimer.time do |timer|
         sleep 1
         expect(timer.total_time.round).must_equal(1)
         timer.stop
@@ -26,7 +26,7 @@ describe MonotonicTimer do
     end
 
     it "alters the block time if it is started and stopped within the block" do
-      block_time = MonotonicTimer.time do |timer|
+      block_time = Monotony::MonotonicTimer.time do |timer|
         sleep 1
         timer.stop
         sleep 1
@@ -38,7 +38,7 @@ describe MonotonicTimer do
 
   context "without a block" do
     it 'works' do
-      timer = MonotonicTimer.new
+      timer = Monotony::MonotonicTimer.new
       timer.start
       sleep 1
       expect(timer.total_time.round).must_equal(1)
