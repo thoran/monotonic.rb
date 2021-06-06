@@ -1,8 +1,8 @@
 # monotonic_timer.rb
 # MonotonicTimer
 
-# 20210510
-# 0.2.0
+# 20210604
+# 0.3.0
 
 require_relative './monotonic_time'
 
@@ -14,6 +14,7 @@ class MonotonicTimer
       monotonic_timer = MonotonicTimer.new
       monotonic_timer.start
       yield monotonic_timer
+      monotonic_timer.total_time
     ensure
       monotonic_timer.stop
     end

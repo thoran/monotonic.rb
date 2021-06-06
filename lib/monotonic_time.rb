@@ -27,9 +27,3 @@ class MonotonicTime
   end
 
 end
-
-if __FILE__ == $0
-  p monotonic_time = MonotonicTime.now
-  p monotonic_time.to_time
-  p monotonic_time.to_s
-end
