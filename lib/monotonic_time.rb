@@ -1,4 +1,5 @@
-# 20200115
+# monotonic_time.rb
+# MonotonicTime
 
 require 'sys-uptime'
 
@@ -27,6 +28,8 @@ class MonotonicTime
 
 end
 
-p monotonic_time = MonotonicTime.now
-p monotonic_time.to_time
-p monotonic_time.to_s
+if __FILE__ == $0
+  p monotonic_time = MonotonicTime.now
+  p monotonic_time.to_time
+  p monotonic_time.to_s
+end

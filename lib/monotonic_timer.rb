@@ -1,4 +1,10 @@
-# 20200115
+# monotonic_timer.rb
+# MonotonicTimer
+
+# 20210510
+# 0.1.1
+
+require_relative './monotonic_time'
 
 class MonotonicTimer
 
@@ -33,4 +39,18 @@ class MonotonicTimer
     @total_time + (monotonic_time_now.to_time - @start_time)
   end
 
+end
+
+if __FILE__ == $0
+  MonotonicTimer.time do |timer|
+    sleep 1
+    print(timer.total_time.round == 1 ? '.' : 'x')
+    timer.stop
+    print(timer.total_time.round == 2 ? '.' : 'x')
+    sleep 1
+    print(timer.total_time.round == 3 ? '.' : 'x')
+    timer.start
+    print(timer.total_time.round == 1 ? '.' : 'x')
+    puts
+  end
 end
