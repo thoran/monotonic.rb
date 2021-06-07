@@ -17,11 +17,15 @@ describe Monotony::MonotonicTimer do
         sleep 1
         expect(timer.total_time.round).must_equal(1)
         timer.stop
-        expect(timer.total_time.round).must_equal(2)
-        sleep 1
-        expect(timer.total_time.round).must_equal(3)
-        timer.start
         expect(timer.total_time.round).must_equal(1)
+        timer.start
+        expect(timer.total_time.round).must_equal(0)
+        sleep 1
+        expect(timer.total_time.round).must_equal(1)
+        sleep 1
+        expect(timer.total_time.round).must_equal(2)
+        timer.start
+        expect(timer.total_time.round).must_equal(0)
       end
     end
 
@@ -31,6 +35,7 @@ describe Monotony::MonotonicTimer do
         timer.stop
         sleep 1
         timer.start
+        sleep 1
       end
       expect(block_time.round).must_equal(1)
     end
@@ -43,11 +48,15 @@ describe Monotony::MonotonicTimer do
       sleep 1
       expect(timer.total_time.round).must_equal(1)
       timer.stop
-      expect(timer.total_time.round).must_equal(2)
-      sleep 1
-      expect(timer.total_time.round).must_equal(3)
-      timer.start
       expect(timer.total_time.round).must_equal(1)
+      timer.start
+      expect(timer.total_time.round).must_equal(0)
+      sleep 1
+      expect(timer.total_time.round).must_equal(1)
+      sleep 1
+      expect(timer.total_time.round).must_equal(2)
+      timer.start
+      expect(timer.total_time.round).must_equal(0)
     end
   end
 end

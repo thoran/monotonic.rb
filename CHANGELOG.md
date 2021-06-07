@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.4.1 (20210607): Fixed starting and stopping
+- MonotonicTimer#initialize: - @total_time as it just made things more complicated unless needing splits
+~ MonotonicTimer#start: - @start_monotonic_time as it wasn't really needed
+~ MonotonicTimer#stop: - @stop_monotonic_time as it wasn't really needed
+~ MonotonicTimer#total_time: - @total_time as it just made things more complicated unless needing splits
+
 ## 0.4.0 (20210606): Named Monotony and prepped as a gem.
 /monotonic_time.rb/MonotonicTime.rb/
 /monotonic_timer.rb/MonotonicTimer.rb/
