@@ -18,6 +18,24 @@ describe Monotony::MonotonicTime do
     end
   end
 
+  describe "#seconds_since_boot" do
+    it "returns an instance of string" do
+      expect((subject.seconds_since_boot).class).must_equal(Float)
+    end
+  end
+
+  describe "#+" do
+    it "returns an instance of string" do
+      expect((subject + Monotony::MonotonicTime.now).class).must_equal(Float)
+    end
+  end
+
+  describe "#-" do
+    it "returns an instance of time" do
+      expect((subject - Monotony::MonotonicTime.now).class).must_equal(Float)
+    end
+  end
+
   describe "#to_s" do
     it "returns an instance of string" do
       expect(subject.to_s.class).must_equal(String)

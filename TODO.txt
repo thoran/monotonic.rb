@@ -1,6 +1,6 @@
 To do in no particular order:
 
-* Allow for the block form on an instance of MonotonicTimer
-* Include my as yet unpublished ISO units library
+* Allow for the block form on an instance of MonotonicTimer (Done as of 0.5.0)
+* Include my as yet unpublished SI units library
 * Allow for being able to start and stop without resetting the total time for a block
-* Introduce basic math to MonotonicTime
+* Introduce basic math to MonotonicTime (Done as of 0.5.0)

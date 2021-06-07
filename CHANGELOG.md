@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 0.5.0 (20210607): Added timing block on an instance of MonotonicTimer
++ MonotonicTime#+
++ MonotonicTime#-
+~ MonotonicTimer#start: - use of MonotonicTime#to_time (using MonotonicTime#- instead)
+~ MonotonicTimer#stop: - use of MonotonicTime#to_time (using MonotonicTime#- instead)
++ MonotonicTimer#time
+
 ## 0.4.1 (20210607): Fixed starting and stopping
 - MonotonicTimer#initialize: - @total_time as it just made things more complicated unless needing splits
 ~ MonotonicTimer#start: - @start_monotonic_time as it wasn't really needed

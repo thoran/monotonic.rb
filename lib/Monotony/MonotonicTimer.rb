@@ -21,19 +21,28 @@ module Monotony
 
     def start
       @finish_time = nil
-      @start_time = MonotonicTime.now.to_time
+      @start_time = MonotonicTime.now
     end
 
     def stop
-      @finish_time = MonotonicTime.now.to_time
+      @finish_time = MonotonicTime.now
     end
 
     def total_time
       if @finish_time
         @finish_time - @start_time
       else
-        MonotonicTime.now.to_time - @start_time
+        MonotonicTime.now - @start_time
       end
     end
+
+    def time
+      start
+      yield self
+    ensure
+      stop
+      total_time
+    end
+
   end
 end

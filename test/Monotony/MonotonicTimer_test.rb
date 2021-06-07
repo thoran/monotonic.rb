@@ -59,4 +59,23 @@ describe Monotony::MonotonicTimer do
       expect(timer.total_time.round).must_equal(0)
     end
   end
+
+  context "with a block on an timer instance" do
+    it 'works' do
+      timer = Monotony::MonotonicTimer.new
+      time = timer.time do |timer|
+        sleep 1
+        expect(timer.total_time.round).must_equal(1)
+        timer.stop
+        expect(timer.total_time.round).must_equal(1)
+        sleep 1
+        expect(timer.total_time.round).must_equal(1)
+        timer.start
+        expect(timer.total_time.round).must_equal(0)
+        sleep 1
+      end
+      expect(time.round).must_equal(1)
+      expect(timer.total_time.round).must_equal(1)
+    end
+  end
 end

@@ -14,9 +14,19 @@ module Monotony
 
     end # class << self
 
+    attr_reader :seconds_since_boot
+
     def initialize
       @boot_time = Sys::Uptime.boot_time
       @seconds_since_boot = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+    end
+
+    def +(monotonic_time_addend)
+      @seconds_since_boot + monotonic_time_addend.seconds_since_boot
+    end
+
+    def -(monotonic_time_subtrahend)
+      @seconds_since_boot - monotonic_time_subtrahend.seconds_since_boot
     end
 
     def to_s

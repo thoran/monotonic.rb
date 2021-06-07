@@ -27,6 +27,12 @@ $ gem install monotony.rb
   require 'monotony.rb'
   include Monotony
   monotonic_time = MonotonicTime.new
+  monotonic_time.seconds_since_boot
+  # => 1208799.325906
+  monotonic_time + MonotonicTime.now
+  # => 2417598.681896
+  monotonic_time - MonotonicTime.now
+  # => -0.044104999862611294
   monotonic_time.to_s
   # => "1164320.268127 seconds since boot."
   monotonic_time.to_time
@@ -39,7 +45,6 @@ $ gem install monotony.rb
 require 'monotony.rb'
 include Monotony
 time = MonotonicTimer.time do |timer|
-  p timer
   i = 0
   1_000_000.times{puts i += 1}
 end
@@ -59,6 +64,20 @@ i = 0
 timer.stop
 timer.total_time
 # => 7.166559999808669
+```
+
+### Monotony::MonotonicTimer with a block on a timer instance
+
+```ruby
+require 'monotony.rb'
+include Monotony
+timer = MonotonicTimer.new
+time = timer do |timer|
+  i = 0
+  1_000_000.times{puts i += 1}
+end
+time
+# => 7.033131000120193
 ```
 
 ## Contributing
