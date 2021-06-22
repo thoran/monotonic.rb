@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 0.6.0 (20210623): Version number bump due to name change from monotony.rb to monotonic.rb
+/Monotony//, Monotonic::Timer is shorter than Monotony::MonotonicTimer
+
 ## 0.5.0 (20210607): Added timing block on an instance of MonotonicTimer
 + MonotonicTime#+
 + MonotonicTime#-

@@ -1,10 +1,10 @@
-# Monotony/MonotonicTime.rb
-# Monotony::MonotonicTime
+# Monotonic/Time.rb
+# Monotonic::Time
 
 require 'sys-uptime'
 
-module Monotony
-  class MonotonicTime
+module Monotonic
+  class Time
 
     class << self
 

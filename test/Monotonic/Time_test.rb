@@ -1,10 +1,10 @@
-require_relative '../../lib/Monotony/MonotonicTime'
+require_relative '../../lib/Monotonic/Time'
 
 require 'minitest/autorun'
 require 'minitest-spec-context'
 
-describe Monotony::MonotonicTime do
-  subject{Monotony::MonotonicTime.now}
+describe Monotonic::Time do
+  subject{Monotonic::Time.now}
 
   describe "#initialize" do
     it "the time spent in the block is returned as the value of the block" do
@@ -26,13 +26,13 @@ describe Monotony::MonotonicTime do
 
   describe "#+" do
     it "returns an instance of string" do
-      expect((subject + Monotony::MonotonicTime.now).class).must_equal(Float)
+      expect((subject + Monotonic::Time.now).class).must_equal(Float)
     end
   end
 
   describe "#-" do
     it "returns an instance of time" do
-      expect((subject - Monotony::MonotonicTime.now).class).must_equal(Float)
+      expect((subject - Monotonic::Time.now).class).must_equal(Float)
     end
   end
 
