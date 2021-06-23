@@ -1,4 +1,4 @@
-# monotonic
+# monotonic.rb
 
 ## Description
 
@@ -16,7 +16,7 @@ And then execute:
 ```
 Or install it yourself as:
 ```bash
-  $ gem install monotonic
+  $ gem install monotonic.rb
 ```
 
 ## Usage
@@ -24,8 +24,7 @@ Or install it yourself as:
 ### MonotonicTime
 
 ```ruby
-  require 'monotonic'
-  include Monotonic
+  require 'monotonic.rb'
   monotonic_time = Monotonic::Time.new
   monotonic_time.seconds_since_boot
   # => 1208799.325906
@@ -42,9 +41,8 @@ Or install it yourself as:
 ### Monotonic::Timer without a block
 
 ```ruby
-  require 'monotonic'
-  include Monotonic
-  timer = Timer.new
+  require 'monotonic.rb'
+  timer = Monotonic::Timer.new
   timer.start
   i = 0
   1_000_000.times{puts i += 1}
@@ -56,9 +54,8 @@ Or install it yourself as:
 ### Monotonic::Timer with a block
 
 ```ruby
-  require 'monotonic'
-  include Monotonic
-  time = Timer.time do
+  require 'monotonic.rb'
+  time = Monotonic::Timer.time do
     i = 0
     1_000_000.times{puts i += 1}
   end
@@ -69,9 +66,8 @@ Or install it yourself as:
 ### Monotonic::Timer with a block and block variable
 
 ```ruby
-  require 'monotonic'
-  include Monotonic
-  time = Timer.time do |timer|
+  require 'monotonic.rb'
+  time = Monotonic::Timer.time do |timer|
     i = 0
     500_000.times{puts i += 1}
     p timer.total_time
@@ -84,10 +80,9 @@ Or install it yourself as:
 ### Monotonic::Timer with a block on a timer instance
 
 ```ruby
-  require 'monotonic'
-  include Monotonic
-  timer = Timer.new
-  time = timer do
+  require 'monotonic.rb'
+  timer = Monotonic::Timer.new
+  time = timer.time do
     i = 0
     1_000_000.times{puts i += 1}
   end
@@ -97,7 +92,7 @@ Or install it yourself as:
 
 ## Contributing
 
-1. Fork it ( https://github.com/thoran/monotonic/fork )
+1. Fork it ( https://github.com/thoran/monotonic.rb/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)

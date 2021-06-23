@@ -8,13 +8,9 @@ module Monotonic
 
     class << self
 
-      def time
+      def time(&block)
         timer = Timer.new
-        timer.start
-        yield timer
-      ensure
-        timer.stop
-        timer.total_time
+        timer.time(&block)
       end
 
     end # class << self

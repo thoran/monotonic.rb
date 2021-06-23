@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.6.1 (20210623): README fix and a small refactor
+~ README.md: /monotonic/monotonic.rb/
+~ Monotonic::Timer.time to make use of the same-named instance method now that it's available.
+
 ## 0.6.0 (20210623): Version number bump due to name change from monotony.rb to monotonic.rb
 /Monotony//, Monotonic::Timer is shorter than Monotony::MonotonicTimer
 
