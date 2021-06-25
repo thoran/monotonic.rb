@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 0.6.2 (20210625): Fixed missing sys-uptime dependency
+~ montonic.rb.gemspec to include the sys-uptime dependency
+
 ## 0.6.1 (20210623): README fix and a small refactor
 ~ README.md: /monotonic/monotonic.rb/
 ~ Monotonic::Timer.time to make use of the same-named instance method now that it's available.

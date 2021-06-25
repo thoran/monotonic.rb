@@ -17,6 +17,7 @@ Gem::Specification.new do |spec|
   spec.files = Dir['lib/**/*.rb']
   spec.required_ruby_version = '>= 2.5'
 
+  spec.add_dependency('sys-uptime')
   spec.add_development_dependency('minitest')
   spec.add_development_dependency('minitest-spec-context')
 end

@@ -1,4 +1,4 @@
-# Monotonic::Timer.rb
+# Monotonic/Timer.rb
 # Monotonic::Timer
 
 require_relative './Time'
