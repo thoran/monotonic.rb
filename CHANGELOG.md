@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 0.6.3: (20210627): Using gemspec in Gemfile
+~ Gemfile to use gemspec rather than having dependencies enumerated there
+
 ## 0.6.2 (20210625): Fixed missing sys-uptime dependency
 ~ montonic.rb.gemspec to include the sys-uptime dependency
 

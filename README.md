@@ -8,7 +8,7 @@ Create accurate timings of excution in Ruby.
 
 Add this line to your application's Gemfile:
 ```ruby
-  gem 'monotonic'
+  gem 'monotonic.rb'
 ```
 And then execute:
 ```bash
