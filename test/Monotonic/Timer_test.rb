@@ -12,6 +12,15 @@ describe Monotonic::Timer do
       expect(block_time.round).must_equal(3)
     end
 
+    # Test introduced in 0.6.5 to demonstrate that the bug had been fixed.
+    it "the time spent in the block is returned as the value of the block and not a value at the end of the block" do
+      block_time = Monotonic::Timer.time do |timer|
+        sleep 3
+        4
+      end
+      expect(block_time.round).must_equal(3)
+    end
+
     it "allows the timer to be started and stopped within the block" do
       Monotonic::Timer.time do |timer|
         sleep 1

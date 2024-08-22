@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 0.6.5: (20240822): Block usage bug fix
+~ lib/monotonic/Timer.rb: The total_time must be explicitly returned since values in ensure are not returned as the default return value.
+
 ## 0.6.4: (20240822): Correct README.md
 ~ README.md: In the Usage section: /MonotonicTime/Monotonic::Time/
 ~ lib/monotonic/VERSION.rb: 0.6.3 --> 0.6.4 because I mistakenly pulled the 0.6.3 gem.

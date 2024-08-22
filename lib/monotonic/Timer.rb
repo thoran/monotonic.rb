@@ -37,7 +37,7 @@ module Monotonic
       yield self
     ensure
       stop
-      total_time
+      return total_time
     end
 
   end
