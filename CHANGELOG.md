@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.6.4: (20240822): Correct README.md
+~ README.md: In the Usage section: /MonotonicTime/Monotonic::Time/
+~ lib/monotonic/VERSION.rb: 0.6.3 --> 0.6.4 because I mistakenly pulled the 0.6.3 gem.
+
 ## 0.6.3: (20210627): Using gemspec in Gemfile
 ~ Gemfile to use gemspec rather than having dependencies enumerated there
 

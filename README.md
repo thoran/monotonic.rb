@@ -21,7 +21,7 @@ Or install it yourself as:
 
 ## Usage
 
-### MonotonicTime
+### Monotonic::Time
 
 ```ruby
   require 'monotonic.rb'
