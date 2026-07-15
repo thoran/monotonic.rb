@@ -1,8 +1,6 @@
 # Monotonic/VERSION.rb
 # Monotonic::VERSION
 
-class Monotonic
-
-  VERSION = '0.6.5'
-
+module Monotonic
+  VERSION = '0.6.6'
 end

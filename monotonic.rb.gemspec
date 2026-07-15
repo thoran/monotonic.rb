@@ -4,7 +4,7 @@ Gem::Specification.new do |spec|
   spec.name = 'monotonic.rb'
 
   spec.version = Monotonic::VERSION
-  spec.date = '2024-08-22'
+  spec.date = '2026-07-16'
 
   spec.summary = "Monotonic timing made easy."
   spec.description = "Create accurate timings of excution in Ruby."
