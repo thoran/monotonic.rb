@@ -2,9 +2,7 @@ require_relative './lib/Monotonic/VERSION'
 
 Gem::Specification.new do |spec|
   spec.name = 'monotonic.rb'
-
   spec.version = Monotonic::VERSION
-  spec.date = '2024-08-22'
 
   spec.summary = "Monotonic timing made easy."
   spec.description = "Create accurate timings of excution in Ruby."

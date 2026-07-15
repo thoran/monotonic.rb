@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.6.6 (20260716): Case-sensitive filesystem fixes.
+~ lib/monotonic/ --> lib/Monotonic/: the directory was the only reference using lowercase, while the entry require, the test requires and the gemspec all already used Monotonic/, so the published gem failed to load on case-sensitive (Linux) filesystems.
+~ lib/Monotonic/VERSION.rb: /class Monotonic/module Monotonic/ so it matches the module reopened in Time.rb and Timer.rb, rather than raising TypeError when loaded alongside them.
++ lib/monotonic.rb: require_relative './Monotonic/VERSION' (as Duration.rb does for its own VERSION), so Monotonic::VERSION is available after requiring the gem. VERSION.rb being off the load path is what let the class/module error above go unnoticed: nothing loaded it alongside Time.rb and Timer.rb, so the conflict never fired.
+
 ## 0.6.5: (20240822): Block usage bug fix
 ~ lib/monotonic/Timer.rb: The total_time must be explicitly returned since values in ensure are not returned as the default return value.
 
