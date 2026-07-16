@@ -5,13 +5,10 @@ require 'sys-uptime'
 
 module Monotonic
   class Time
-
     class << self
-
       def now
         self.new
       end
-
     end # class << self
 
     attr_reader :seconds_since_boot
@@ -36,6 +33,5 @@ module Monotonic
     def to_time
       @boot_time + @seconds_since_boot
     end
-
   end
 end

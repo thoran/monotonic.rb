@@ -21,6 +21,11 @@ describe Monotonic::Timer do
       expect(block_time.round).must_equal(3)
     end
 
+    # Test introduced in 0.6.7 to demonstrate that the bug had been fixed.
+    it "an exception raised within the block is not swallowed" do
+      expect{Monotonic::Timer.time{raise(ArgumentError)}}.must_raise(ArgumentError)
+    end
+
     it "allows the timer to be started and stopped within the block" do
       Monotonic::Timer.time do |timer|
         sleep 1
@@ -84,6 +89,21 @@ describe Monotonic::Timer do
         sleep 1
       end
       expect(time.round).must_equal(1)
+      expect(timer.total_time.round).must_equal(1)
+    end
+
+    # Test introduced in 0.6.7 to demonstrate that the time up to an
+    # interruption is not left running.
+    it "the time up to an interruption remains available from the timer" do
+      timer = Monotonic::Timer.new
+      begin
+        timer.time do
+          sleep 1
+          raise(ArgumentError)
+        end
+      rescue ArgumentError
+      end
+      sleep 1
       expect(timer.total_time.round).must_equal(1)
     end
   end

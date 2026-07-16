@@ -1,0 +1,143 @@
+# CHANGELOG
+
+## 20260716
+
+0.6.7: Block exception bug fix, relicensing, and gem packaging changes.
+
+1. ~ Monotonic::Timer#time: - the `return total_time` from the ensure clause, since returning from an ensure swallowed any exception raised by the block, handing back a duration in place of the error. The exception is now allowed to propagate. The ensure itself is kept, and narrowed to the block, so that stop still runs when the block is interrupted: the time up to an interruption is worth having, and without the stop total_time would go on running rather than hold at the point of interruption. It is read from the timer, since the return value belongs to the exception.
+2. ~ test/Monotonic/Timer_test.rb: + a test to demonstrate that an exception raised within the block is no longer swallowed.
+3. ~ test/Monotonic/Timer_test.rb: + a test to demonstrate that the time up to an interruption holds rather than goes on running.
+4. - test/monotonic_test.rb: A Rakefile has been introduced to run all files.
+5. ~ monotonic.rb.gemspec: /Ruby/MIT/ for the license.
+6. ~ monotonic.rb.gemspec: Gem::Specification#dependencies= and #development_dependencies=, so that dependencies may be enumerated as a list rather than a call apiece.
+7. ~ monotonic.rb.gemspec: spec.files to include CHANGELOG, Gemfile, the gemspec, the Rakefile, README.md and the tests, rather than lib/**/*.rb alone.
+8. ~ monotonic.rb.gemspec: spec.require_paths, since spec.files is no longer confined to lib/.
+9. + monotonic.rb.gemspec: rake as a development dependency.
+10. + Rakefile: a test task, run by default.
+11. ~ lib/Monotonic/Time.rb: - empty lines from within the class body.
+12. ~ lib/Monotonic/Timer.rb: - empty lines from within the class body.
+13. ~ CHANGELOG: Reformat headers, number the changes, and remove `.md`.
+14. ~ Monotonic::VERSION: /0.6.6/0.6.7/
+
+
+## 20260716
+
+0.6.6: Case-sensitive filesystem fixes.
+
+1. ~ lib/monotonic/ --> lib/Monotonic/: the directory was the only reference using lowercase, while the entry require, the test requires and the gemspec all already used Monotonic/, so the published gem failed to load on case-sensitive (Linux) filesystems.
+2. ~ lib/Monotonic/VERSION.rb: /class Monotonic/module Monotonic/ so it matches the module reopened in Time.rb and Timer.rb, rather than raising TypeError when loaded alongside them.
+3. + lib/monotonic.rb: require_relative './Monotonic/VERSION' (as Duration.rb does for its own VERSION), so Monotonic::VERSION is available after requiring the gem. VERSION.rb being off the load path is what let the class/module error above go unnoticed: nothing loaded it alongside Time.rb and Timer.rb, so the conflict never fired.
+
+
+## 20240822
+
+0.6.5: Block usage bug fix
+
+1. ~ lib/monotonic/Timer.rb: The total_time must be explicitly returned since values in ensure are not returned as the default return value.
+
+
+## 20240822
+
+0.6.4: Correct README.md.
+
+1. ~ README.md: In the Usage section: /MonotonicTime/Monotonic::Time/
+2. ~ lib/monotonic/VERSION.rb: 0.6.3 --> 0.6.4 because I mistakenly pulled the 0.6.3 gem.
+
+
+## 20210627
+
+0.6.3: Using gemspec in Gemfile.
+
+1. ~ Gemfile to use gemspec rather than having dependencies enumerated there
+
+
+## 20210625
+
+0.6.2: Fixed missing sys-uptime dependency.
+
+1. ~ montonic.rb.gemspec to include the sys-uptime dependency
+
+
+## 20210623
+
+0.6.1: README fix and a small refactor
+
+1. ~ README.md: /monotonic/monotonic.rb/
+2. ~ Monotonic::Timer.time to make use of the same-named instance method now that it's available.
+
+
+## 20210623
+
+0.6.0: Version number bump due to name change from monotony.rb to monotonic.rb
+
+1. /Monotony//, Monotonic::Timer is shorter than Monotony::MonotonicTimer
+
+
+## 20210607
+
+0.5.0: Added timing block on an instance of MonotonicTimer
+
+1. + MonotonicTime#+
+2. + MonotonicTime#-
+3. ~ MonotonicTimer#start: - use of MonotonicTime#to_time (using MonotonicTime#- instead)
+4. ~ MonotonicTimer#stop: - use of MonotonicTime#to_time (using MonotonicTime#- instead)
+5. + MonotonicTimer#time
+
+
+## 20210607
+
+0.4.1: Fixed starting and stopping
+
+1. - MonotonicTimer#initialize: - @total_time as it just made things more complicated unless needing splits
+2. ~ MonotonicTimer#start: - @start_monotonic_time as it wasn't really needed
+3. ~ MonotonicTimer#stop: - @stop_monotonic_time as it wasn't really needed
+4. ~ MonotonicTimer#total_time: - @total_time as it just made things more complicated unless needing splits
+
+
+## 20210606
+
+0.4.0: Named Monotony and prepped as a gem.
+
+1. /monotonic_time.rb/MonotonicTime.rb/
+2. /monotonic_timer.rb/MonotonicTimer.rb/
+3. + Monotony namespace
+4. + monotony.gemspec
+
+
+## 20210604
+
+0.3.0
+
+1. ~ MonotonicTimer.time, so that it returns the total time to the value of the block
+2. + ./test/monotonic_time_test.rb
+3. ~ ./test/monotonic_timer_test.rb
+
+
+## 20210510
+
+0.2.0: Added somewhat proper testing
+
+1. + ./test/monotonic_timer_test.rb
+2. ~ ./lib/monotonic_timer.rb: - self-run section test
+
+
+## 20200510
+
+0.1.1
+
+1. ~ ./lib/monotonic_timer.rb: + self-run section test
+
+
+## 20200115
+
+0.1.0: Added classes for better structure
+
+1. + MonotonicTime
+2. + MonotonicTimer
+
+
+## 20200115
+
+0.0.0
+
+1. + timer()

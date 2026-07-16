@@ -5,14 +5,11 @@ require_relative './Time'
 
 module Monotonic
   class Timer
-
     class << self
-
       def time(&block)
         timer = Timer.new
         timer.time(&block)
       end
-
     end # class << self
 
     def start
@@ -34,11 +31,12 @@ module Monotonic
 
     def time
       start
-      yield self
-    ensure
-      stop
-      return total_time
+      begin
+        yield self
+      ensure
+        stop
+      end
+      total_time
     end
-
   end
 end
