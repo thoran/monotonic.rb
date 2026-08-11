@@ -1,5 +1,28 @@
 # CHANGELOG
 
+## 20260811
+
+0.7.0: Read the clock exactly, and read a clock worth reading exactly.
+
+1. ~ lib/Monotonic/Time.rb: Process.clock_gettime is now asked for :nanosecond, where it answers with an Integer, rather than for seconds, where it answers with a Float. A Float's mantissa is of a fixed width wherever it sits, so its absolute resolution falls away as the uptime grows: around 2.2e-16s near 1.0, but only 4.7e-10s at a month of uptime.
+2. + Monotonic::Time#nanoseconds_since_boot: the reading itself, exact.
+3. ~ Monotonic::Time#seconds_since_boot: /attr_reader/derived from the nanosecond reading/, so that the rounding happens where it is asked for rather than where the clock is read. It returns a Float as before.
+4. + Monotonic::NANOSECONDS_PER_SECOND, being needed by both Time and Timer.
+5. + Monotonic::Timer#total_nanoseconds: an elapsed interval as an exact Integer. This is where the reading was formerly spent, an interval being the difference of two Floats drawn from an uptime many orders of magnitude larger than itself.
+6. ~ Monotonic::Timer#total_time: derived from #total_nanoseconds. It returns a Float as before.
+7. ~ Monotonic::Timer#total_time: - the branch upon @finish_time, which moved to a private #finish_nanoseconds, so that the running and stopped cases are distinguished in one place rather than in each caller.
+8. + Monotonic::Timer.clock_name and Monotonic::Time.clock_name, and Monotonic::Timer::CLOCK, being CLOCK_UPTIME_RAW where it is defined and CLOCK_MONOTONIC otherwise. An interval is not an instant and wants a different clock: upon Darwin CLOCK_UPTIME_RAW advances in some 42ns against the 1000ns of CLOCK_MONOTONIC, and holds while the machine sleeps, a closed lid being no part of execution. Linux has no such clock, but its CLOCK_MONOTONIC already holds while suspended and advances finely, so the fallback carries the same meaning and not merely the same name. Exactness alone was worth little upon the old clock, whose 1000ns tick a Float would not have troubled for 142 years of uptime; upon 42ns it begins to tell after six.
+9. ~ Monotonic::Timer: - its use of Monotonic::Time, since the two now read different clocks. @start_time and @finish_time become @start_nanoseconds and @finish_nanoseconds, read through a private #now.
+10. ~ Monotonic::Time::CLOCK, being CLOCK_MONOTONIC still, and now named. #to_time maps an instant back onto the wall clock by way of the boot time, so the clock wanted there is the one tracking time since boot as the wall clock understands it, sleep and all.
+11. + Monotonic::Time.resolution and Monotonic::Timer.resolution, from Process.clock_getres. How finely a clock advances is a property of the processor and the operating system, so it is asked rather than tabulated, and a README sentence about one platform cannot stand in for it. A reading is denominated in nanoseconds whether or not the clock affords them; this is the method which says what a reading is worth.
+12. ~ .clock_name is a method upon both classes rather than a CLOCK_NAME constant, since which clock is read is something found by asking the platform, as .resolution is, and not a property this library declares. A constant would also have frozen a contestable decision: sleep is excluded from a timed interval here, and nothing could have said otherwise. CLOCK stays a constant, being read twice upon every measurement against a floor of some tens of nanoseconds, and is now commented as such.
+13. ~ test/Monotonic/Time_test.rb: ~ the initialize test, which read @seconds_since_boot, to read @nanoseconds_since_boot.
+14. + test/Monotonic/Time_test.rb: tests for .clock_name, .resolution and #nanoseconds_since_boot, and that #seconds_since_boot is that reading expressed in seconds.
+15. + test/Monotonic/Timer_test.rb: tests for #total_nanoseconds, including that it holds while the timer is stopped, and for the clock: which one is chosen, that CLOCK follows .clock_name, that it reports its resolution, and that it is no coarser than the one Monotonic::Time reads.
+16. ~ README.md: + #nanoseconds_since_boot, #total_nanoseconds and .resolution to the description and the usage. The description now distinguishes denomination from resolution, asking for :nanosecond settling only what the figure counts, and points at .resolution rather than making a claim about any one platform.
+17. ~ Monotonic::VERSION: /0.6.7/0.7.0/
+
+
 ## 20260716
 
 0.6.7: Block exception bug fix, relicensing, and gem packaging changes.

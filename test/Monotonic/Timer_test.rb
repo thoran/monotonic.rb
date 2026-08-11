@@ -107,4 +107,53 @@ describe Monotonic::Timer do
       expect(timer.total_time.round).must_equal(1)
     end
   end
+
+  context "the clock" do
+    it "is the finest available which holds while the machine sleeps" do
+      expect(Monotonic::Timer.clock_name) \
+        .must_equal(Process.const_defined?(:CLOCK_UPTIME_RAW) ? :CLOCK_UPTIME_RAW : :CLOCK_MONOTONIC)
+    end
+
+    it "is asked of the platform rather than declared" do
+      expect(Monotonic::Timer::CLOCK).must_equal(Process.const_get(Monotonic::Timer.clock_name))
+    end
+
+    it "reports its resolution rather than leaving it to be assumed" do
+      expect(Monotonic::Timer.resolution) \
+        .must_equal(Process.clock_getres(Monotonic::Timer::CLOCK, :nanosecond))
+    end
+
+    it "is no coarser than the one Monotonic::Time reads" do
+      expect(Monotonic::Timer.resolution).must_be :<=, Monotonic::Time.resolution
+    end
+  end
+
+  context "in nanoseconds" do
+    it "returns an instance of integer" do
+      timer = Monotonic::Timer.new
+      timer.start
+      sleep 1
+      timer.stop
+      expect(timer.total_nanoseconds.class).must_equal(Integer)
+    end
+
+    it "is the total time expressed in nanoseconds" do
+      timer = Monotonic::Timer.new
+      timer.start
+      sleep 1
+      timer.stop
+      expect(timer.total_nanoseconds / 1_000_000_000.0).must_equal(timer.total_time)
+    end
+
+    it "holds while the timer is stopped and runs on while it is not" do
+      timer = Monotonic::Timer.new
+      timer.start
+      timer.stop
+      held = timer.total_nanoseconds
+      sleep 1
+      expect(timer.total_nanoseconds).must_equal(held)
+      timer.start
+      expect(timer.total_nanoseconds).must_be :>, 0
+    end
+  end
 end
