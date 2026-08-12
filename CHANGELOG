@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 20260812
+
+0.7.1: + VERSION test.
+
+1. + test/Monotonic/VERSION_test.rb: Ensure that VERSION is a string, that it has three dotted numbers, and that it matches the newest entry in the CHANGELOG. A release edits both files and this now ensures that one moves with the other. Modelled upon moby.rb's.
+2. ~ Monotonic::VERSION: /0.7.0/0.7.1/
+
+
 ## 20260811
 
 0.7.0: Read the clock exactly, and read a clock worth reading exactly.
