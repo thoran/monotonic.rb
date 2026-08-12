@@ -2,6 +2,14 @@
 
 ## 20260812
 
+0.7.2: + gemspec test.
+
+1. + test/gemspec_test.rb: Ensure that the specification validates, that no date is pinned, that the version comes from Monotonic::VERSION, and that the runtime and development dependencies are those expected.
+2. ~ Monotonic::VERSION: /0.7.1/0.7.2/
+
+
+## 20260812
+
 0.7.1: + VERSION test.
 
 1. + test/Monotonic/VERSION_test.rb: Ensure that VERSION is a string, that it has three dotted numbers, and that it matches the newest entry in the CHANGELOG. A release edits both files and this now ensures that one moves with the other. Modelled upon moby.rb's.
