@@ -2,6 +2,31 @@
 
 ## 20260816
 
+0.8.0: Use duration.rb gem.
+
+1. + duration.rb as a dependency, constrained to >= 0.4.0 where sys-uptime is unconstrained. Units and the arithmetic between them are its business, and were being hand-rolled here. 0.4.0 is where Duration::Nanoseconds arrived, which this gem names, and is the true minimum rather than a guess: the whole API used here exercises clean against it, and everything between is additive.
+2. ~ monotonic.rb.gemspec: spec.dependencies takes a name and a requirement as well as a bare name, the splat in #dependencies= already allowing for it. sys-uptime stays unconstrained as before.
+3. - Monotonic::NANOSECONDS_PER_SECOND, introduced at 0.7.0 and by now divided by in four places. It existed only because the conversion was hand-rolled; a duration converts by exact ratios and stays a Rational until to_f is asked for, where the constant dropped to Float a step early.
+4. + Monotonic::Timer#to_duration, being a Duration::Nanoseconds. An elapsed interval is a duration, and every unit follows from this one exactly.
+5. ~ Monotonic::Timer#total_time: derived from #to_duration. It returns a Float of seconds as before.
+6. ~ Monotonic::Time#seconds_since_boot: converted by a duration rather than by division. It returns a Float as before.
+7. ~ BREAKING: Monotonic::Time#- returns a Duration::Nanoseconds where it returned a Float of seconds. The difference of two instants is a duration, and that is the reason a monotonic clock is read at all. Given a duration instead it returns the earlier instant.
+8. ~ BREAKING: Monotonic::Time#+ takes a Duration and returns a later Monotonic::Time. Given another instant it raises TypeError, where it formerly returned the sum of two seconds-since-boot figures: a quantity which moves when the epoch moves is not a quantity, and the README demonstrated it producing 2417598.681896, which was nothing at all. Ruby's own Time raises upon time + time for the same reason.
+9. ~ Monotonic::Time#initialize takes an optional nanoseconds-since-boot, defaulting to the clock, so that #+ and #- can answer with an instant other than now.
+10. ~ lib/Monotonic/Timer.rb: the constants moved above the methods, CLOCK no longer following .clock_name. + Monotonic::Timer::CLOCK_NAMES, declaring what would be accepted and in what order, so that CLOCK derives from it rather than from a method and need not come after one.
+11. ~ test/Monotonic/Time_test.rb: #+ and #- rewritten for the arithmetic above, including that an instant plus an instant raises and a bare number is refused.
+12. + test/Monotonic/Timer_test.rb: #to_duration, that it carries the same figure as #total_nanoseconds and converts to the same seconds as #total_time.
+13. ~ test/gemspec_test.rb: the runtime dependency list.
+14. ~ README.md: + what belongs to duration.rb and why, and the usage for the arithmetic and #to_duration.
+15. ~ Monotonic::Time#+ and #-: dispatch upon what the argument answers to rather than upon its class. One question tells the two cases apart — does this know where it sits since boot? — and it is asked of the object: an instant subtracts to a duration, and anything converting to nanoseconds shifts the instant. The refusal of instant plus instant is asked of the same duck, since leaving it to Monotonic::Time happening not to answer #to_nanoseconds would be an accident rather than a rule. A bare number still raises TypeError, the guard asking respond_to? rather than is_a?: duck typing forbids asking after a class, not asking after a capability. Ruby raises TypeError for an unsuitable operand throughout — Time, Integer, Float, Rational — and NoMethodError is a NameError, the family meaning that something named does not exist, where here the caller named #- which does. The message carries the protocol a duck must satisfy, so nothing is lost by not letting it escape. The parameters are named for their arithmetic role rather than for a type: /monotonic_time_addend/addend/ and /monotonic_time_subtrahend/subtrahend/, the type half of each having been an unenforced claim in any case, the old #- never having checked what it was given.
+16. + Monotonic::Timer#initialize takes instants:, defaulting to nil, which reads the clock directly as before. Supplied with Monotonic::Time it times upon CLOCK_MONOTONIC instead: coarser, at 1000ns against 42ns, but placeable against the wall clock through #to_time. Anything answering .now will do. This is what 0.7.0 took away without saying so, Timer having read Monotonic::Time as its substrate since 0.1.0 until the two took different clocks — and it could not be given back before now, Monotonic::Time#- having answered with a bare Float of seconds until this release, so that an interval taken from it would have been reported as nanoseconds and been wrong by a factor of a billion.
+17. ~ Monotonic::Timer#total_nanoseconds asks the elapsed figure to say itself in nanoseconds where it can, a raw difference already being in them and an instant's difference being a duration.
+18. + test/Monotonic/Timer_test.rb: which source is read, that either answers in nanoseconds, and that a supplied source times upon its own clock, the figure falling upon a multiple of that clock's resolution.
+19. ~ Monotonic::VERSION: /0.7.3/0.8.0/
+
+
+## 20260816
+
 0.7.3: Require Monotonic::Time from the gem, and stop every instant fetching the boot time.
 
 1. ~ lib/monotonic.rb: + require_relative Monotonic/Time. It had reached a caller only by way of lib/Monotonic/Timer.rb requiring a file which Timer stopped using at 0.7.0, when the two took different clocks. Delete that stray line and Monotonic::Time would have vanished from the published gem, and nothing said so.
@@ -12,7 +37,6 @@
 6. ~ README.md: what Monotonic::Time is for, since 0.7.0 left it with no caller in the library and said only that Timer had stopped using it. It is the point type: the difference of two instants is what a monotonic clock is read for, and #to_time places one against the wall clock.
 7. + .gitignore: the standard list, as duration.rb and namo carry verbatim, in place of the three lines here. It is not among spec.files, so nothing in the published gem changes by it.
 8. ~ Monotonic::VERSION: /0.7.2/0.7.3/
-
 
 ## 20260812
 

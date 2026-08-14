@@ -14,15 +14,26 @@ Which clock is read follows from that. `Monotonic::Timer` measures intervals and
 How finely a clock advances is the platform's business and not this library's to claim, so it is asked rather than tabulated:
 
 ```ruby
-  Monotonic::Timer.resolution
-  # => 42
-  Monotonic::Time.resolution
-  # => 1000
+Monotonic::Timer.resolution
+# => 42
+Monotonic::Time.resolution
+# => 1000
 ```
 
-A reading is denominated in nanoseconds whether or not the clock affords them, so that is the method which says what a reading is worth. Two figures give the sense of it upon the finer clock: reading it costs about 34ns against the 42ns it takes to advance, the two being close enough that there is little to be had by going finer, and a pair of `Float`s would not begin to lose it until some six years of uptime — but they would begin.
+A reading is denominated in nanoseconds whether or not the clock affords it, so that is the method which says what a reading is worth. Two figures give the sense of it upon the finer clock: reading it costs about 34ns against the 42ns it takes to advance, the two being close enough that there is little to be had by going finer, and a pair of `Float`s would not begin to lose it until some six years of uptime — but they would begin.
+
+Units and the arithmetic between them belong to [duration.rb](https://github.com/thoran/duration.rb), which this gem depends upon rather than reimplementing. An elapsed interval is a duration, so `Monotonic::Timer#to_duration` hands one back and every unit follows from it exactly, a Rational until `to_f` is asked for. An instant is not a duration: `Monotonic::Time#-` gives the duration between two instants, `#+` takes a duration and gives a later instant, and adding one instant to another raises — a quantity which moves when you move the epoch is not a quantity, and Ruby's own `Time` refuses it for the same reason.
 
 What `Monotonic::Time` is for follows from that. It is the point type: `Monotonic::Timer` used it as its own substrate until 0.7.0, when the two took different clocks, and what remains to it is what a point is good for — the difference of two instants, which is the reason a monotonic clock is read at all, and `#to_time`, which places one against the wall clock by way of the boot time.
+
+Where a timing is taken from can be chosen. `Monotonic::Timer.new` reads the clock directly, as it always has and much the cheapest; `Monotonic::Timer.new(instants: Monotonic::Time)` times upon `CLOCK_MONOTONIC` instead, coarser but placeable against the wall clock. Anything answering `.now` will do.
+
+```ruby
+timer = Monotonic::Timer.new(instants: Monotonic::Time)
+timer.start; sleep 0.002; timer.stop
+timer.total_nanoseconds
+# => 2508000, upon a clock which ticks in whole microseconds
+```
 
 
 ## Installation
@@ -30,19 +41,19 @@ What `Monotonic::Time` is for follows from that. It is the point type: `Monotoni
 Add this line to your application's Gemfile:
 
 ```ruby
-  gem 'monotonic.rb'
+gem 'monotonic.rb'
 ```
 
 And then execute:
 
 ```bash
-  $ bundle install
+$ bundle install
 ```
 
 Or install it yourself as:
 
 ```bash
-  $ gem install monotonic.rb
+$ gem install monotonic.rb
 ```
 
 
@@ -51,74 +62,92 @@ Or install it yourself as:
 ### Monotonic::Time
 
 ```ruby
-  require 'monotonic.rb'
-  monotonic_time = Monotonic::Time.new
-  monotonic_time.nanoseconds_since_boot
-  # => 2614365376498000
-  monotonic_time.seconds_since_boot
-  # => 1208799.325906
-  monotonic_time + Monotonic::Time.now
-  # => 2417598.681896
-  monotonic_time - Monotonic::Time.now
-  # => -0.044104999862611294
-  monotonic_time.to_s
-  # => "1164320.268127 seconds since boot."
-  monotonic_time.to_time
-  # => 2021-06-07 09:27:08 8249692651179/8388608000000 +1000
+require 'monotonic.rb'
+
+monotonic_time = Monotonic::Time.new
+monotonic_time.nanoseconds_since_boot
+# => 2614365376498000
+
+monotonic_time.seconds_since_boot
+# => 1208799.325906
+
+monotonic_time + Duration::Seconds.new(30)
+# => #<Monotonic::Time>, thirty seconds later
+
+Monotonic::Time.now - monotonic_time
+# => #<Duration::Nanoseconds @nanoseconds=44104999>
+
+monotonic_time + Monotonic::Time.now
+# => TypeError: an instant plus an instant is not an instant
+
+monotonic_time.to_s
+# => "1164320.268127 seconds since boot."
+
+monotonic_time.to_time
+# => 2021-06-07 09:27:08 8249692651179/8388608000000 +1000
 ```
 
 ### Monotonic::Timer without a block
 
 ```ruby
-  require 'monotonic.rb'
-  timer = Monotonic::Timer.new
-  timer.start
-  i = 0
-  1_000_000.times{puts i += 1}
-  timer.stop
-  timer.total_nanoseconds
-  # => 27734000
-  timer.total_time
-  # => 7.166559999808669
+require 'monotonic.rb'
+
+timer = Monotonic::Timer.new
+timer.start
+i = 0
+1_000_000.times{puts i += 1}
+timer.stop
+timer.total_nanoseconds
+# => 27734000
+
+timer.to_duration
+# => #<Duration::Nanoseconds @nanoseconds=27734000>
+
+timer.to_duration.to_microseconds.to_f
+# => 27734.0
+
+timer.total_time
+# => 0.027734
 ```
 
 ### Monotonic::Timer with a block
 
 ```ruby
-  require 'monotonic.rb'
-  time = Monotonic::Timer.time do
-    i = 0
-    1_000_000.times{puts i += 1}
-  end
-  time
-  # => 6.975823000073433
+require 'monotonic.rb'
+
+time = Monotonic::Timer.time do
+  i = 0
+  1_000_000.times{puts i += 1}
+end
+time
+# => 6.975823000073433
 ```
 
 ### Monotonic::Timer with a block and block variable
 
 ```ruby
-  require 'monotonic.rb'
-  time = Monotonic::Timer.time do |timer|
-    i = 0
-    500_000.times{puts i += 1}
-    p timer.total_time
-    500_000.times{puts i += 1}
-  end
-  time
-  # => 6.975823000073433
+require 'monotonic.rb'
+time = Monotonic::Timer.time do |timer|
+  i = 0
+  500_000.times{puts i += 1}
+  p timer.total_time
+  500_000.times{puts i += 1}
+end
+time
+# => 6.975823000073433
 ```
 
 ### Monotonic::Timer with a block on a timer instance
 
 ```ruby
-  require 'monotonic.rb'
-  timer = Monotonic::Timer.new
-  time = timer.time do
-    i = 0
-    1_000_000.times{puts i += 1}
-  end
-  time
-  # => 7.033131000120193
+require 'monotonic.rb'
+timer = Monotonic::Timer.new
+time = timer.time do
+  i = 0
+  1_000_000.times{puts i += 1}
+end
+time
+# => 7.033131000120193
 ```
 
 

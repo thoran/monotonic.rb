@@ -128,6 +128,57 @@ describe Monotonic::Timer do
     end
   end
 
+  context "where the instants come from" do
+    it "reads the clock directly when nothing is supplied" do
+      timer = Monotonic::Timer.new
+      timer.start
+      timer.stop
+      expect(timer.total_nanoseconds.class).must_equal(Integer)
+    end
+
+    it "takes them from whatever is supplied, in nanoseconds still" do
+      timer = Monotonic::Timer.new(instants: Monotonic::Time)
+      timer.start
+      sleep 0.01
+      timer.stop
+      expect(timer.total_nanoseconds.class).must_equal(Integer)
+      expect(timer.total_nanoseconds).must_be :>, 5_000_000
+    end
+
+    it "times upon that source's clock rather than its own" do
+      timer = Monotonic::Timer.new(instants: Monotonic::Time)
+      timer.start
+      sleep 0.01
+      timer.stop
+      expect(timer.total_nanoseconds % Monotonic::Time.resolution).must_equal(0)
+    end
+  end
+
+  context "as a duration" do
+    it "hands back a Duration::Nanoseconds" do
+      timer = Monotonic::Timer.new
+      timer.start
+      timer.stop
+      expect(timer.to_duration.class).must_equal(Duration::Nanoseconds)
+    end
+
+    it "carries the same figure as #total_nanoseconds" do
+      timer = Monotonic::Timer.new
+      timer.start
+      sleep 0.01
+      timer.stop
+      expect(timer.to_duration.to_i).must_equal(timer.total_nanoseconds)
+    end
+
+    it "converts exactly, #total_time being the same in seconds" do
+      timer = Monotonic::Timer.new
+      timer.start
+      sleep 0.01
+      timer.stop
+      expect(timer.to_duration.to_seconds.to_f).must_equal(timer.total_time)
+    end
+  end
+
   context "in nanoseconds" do
     it "returns an instance of integer" do
       timer = Monotonic::Timer.new

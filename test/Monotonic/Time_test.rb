@@ -55,14 +55,35 @@ describe Monotonic::Time do
   end
 
   describe "#+" do
-    it "returns an instance of string" do
-      expect((subject + Monotonic::Time.now).class).must_equal(Float)
+    it "returns a later instant when given a duration" do
+      expect((subject + Duration::Seconds.new(5)).class).must_equal(Monotonic::Time)
+    end
+
+    it "advances by exactly that duration" do
+      expect((subject + Duration::Seconds.new(5)).nanoseconds_since_boot - subject.nanoseconds_since_boot) \
+        .must_equal(5_000_000_000)
+    end
+
+    it "refuses another instant, there being no such quantity" do
+      expect{subject + Monotonic::Time.now}.must_raise(TypeError)
+    end
+
+    it "refuses a bare number, which has no unit" do
+      expect{subject + 5}.must_raise(TypeError)
     end
   end
 
   describe "#-" do
-    it "returns an instance of time" do
-      expect((subject - Monotonic::Time.now).class).must_equal(Float)
+    it "returns the duration between two instants" do
+      expect((subject - Monotonic::Time.now).class).must_equal(Duration::Nanoseconds)
+    end
+
+    it "returns an earlier instant when given a duration" do
+      expect((subject - Duration::Seconds.new(5)).class).must_equal(Monotonic::Time)
+    end
+
+    it "refuses a bare number, which has no unit" do
+      expect{subject - 5}.must_raise(TypeError)
     end
   end
 

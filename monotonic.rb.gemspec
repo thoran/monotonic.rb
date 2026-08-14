@@ -35,9 +35,10 @@ Gem::Specification.new do |spec|
     Dir['test/**/*.rb'],
   ].flatten
 
-  spec.dependencies = %w{
-    sys-uptime
-  }
+  spec.dependencies = [
+    ['duration.rb', '>= 0.4.0'],
+    'sys-uptime'
+  ]
 
   spec.development_dependencies = %w{
     minitest
