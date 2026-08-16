@@ -7,9 +7,8 @@ describe Monotonic::Time do
   subject{Monotonic::Time.now}
 
   describe "#initialize" do
-    it "the time spent in the block is returned as the value of the block" do
-      expect(subject.instance_variable_get(:@boot_time)) \
-        .must_equal(Sys::Uptime.boot_time)
+    it "keeps the reading and nothing else, the boot time being wanted only by #to_time" do
+      expect(subject.instance_variables).must_equal([:@nanoseconds_since_boot])
     end
 
     it "the reading is taken from the monotonic clock in nanoseconds" do
@@ -76,6 +75,10 @@ describe Monotonic::Time do
   describe "#to_time" do
     it "returns an instance of time" do
       expect(subject.to_time.class).must_equal(Time)
+    end
+
+    it "lands upon the wall clock, the boot time being asked for as it stands" do
+      expect((subject.to_time - Time.now).abs).must_be :<, 0.01
     end
   end
 end

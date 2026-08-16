@@ -22,6 +22,8 @@ How finely a clock advances is the platform's business and not this library's to
 
 A reading is denominated in nanoseconds whether or not the clock affords them, so that is the method which says what a reading is worth. Two figures give the sense of it upon the finer clock: reading it costs about 34ns against the 42ns it takes to advance, the two being close enough that there is little to be had by going finer, and a pair of `Float`s would not begin to lose it until some six years of uptime — but they would begin.
 
+What `Monotonic::Time` is for follows from that. It is the point type: `Monotonic::Timer` used it as its own substrate until 0.7.0, when the two took different clocks, and what remains to it is what a point is good for — the difference of two instants, which is the reason a monotonic clock is read at all, and `#to_time`, which places one against the wall clock by way of the boot time.
+
 
 ## Installation
 

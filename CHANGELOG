@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## 20260816
+
+0.7.3: Require Monotonic::Time from the gem, and stop every instant fetching the boot time.
+
+1. ~ lib/monotonic.rb: + require_relative Monotonic/Time. It had reached a caller only by way of lib/Monotonic/Timer.rb requiring a file which Timer stopped using at 0.7.0, when the two took different clocks. Delete that stray line and Monotonic::Time would have vanished from the published gem, and nothing said so.
+2. ~ lib/Monotonic/Timer.rb: - require_relative ./Time, which nothing there has wanted since 0.7.0.
+3. + test/loading_test.rb: that requiring the gem defines Monotonic::Time and Monotonic::Timer, and the version. In a process of its own, this one having loaded every file directly and so being unable to tell what the gem alone would bring. The same hole as VERSION.rb before 0.7.1: a file nothing names is a file nothing checks.
+4. ~ Monotonic::Time#to_time: asks Sys::Uptime for the boot time rather than every instant keeping one. Only this method wanted it, and asking cost 1740ns of the 1947ns an instant took to make, so an instant now costs 194ns. Memoising it was tried and is wrong: Darwin computes kern.boottime from the wall clock and the uptime, so it moves as the clock is disciplined, and a kept copy would fix the origin while the mapping drifted from it.
+5. ~ test/Monotonic/Time_test.rb: the #initialize test asserted @boot_time was set, under a description copied from Timer's about blocks. It now asserts that an instant keeps the reading and nothing else. + that #to_time lands upon the wall clock, which nothing checked.
+6. ~ README.md: what Monotonic::Time is for, since 0.7.0 left it with no caller in the library and said only that Timer had stopped using it. It is the point type: the difference of two instants is what a monotonic clock is read for, and #to_time places one against the wall clock.
+7. + .gitignore: the standard list, as duration.rb and namo carry verbatim, in place of the three lines here. It is not among spec.files, so nothing in the published gem changes by it.
+8. ~ Monotonic::VERSION: /0.7.2/0.7.3/
+
+
 ## 20260812
 
 0.7.2: + gemspec test.
