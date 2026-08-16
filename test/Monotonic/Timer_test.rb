@@ -9,7 +9,7 @@ describe Monotonic::Timer do
       block_time = Monotonic::Timer.time do |timer|
         sleep 3
       end
-      expect(block_time.round).must_equal(3)
+      expect(block_time.to_duration.to_seconds.to_f.round).must_equal(3)
     end
 
     # Test introduced in 0.6.5 to demonstrate that the bug had been fixed.
@@ -18,7 +18,7 @@ describe Monotonic::Timer do
         sleep 3
         4
       end
-      expect(block_time.round).must_equal(3)
+      expect(block_time.to_duration.to_seconds.to_f.round).must_equal(3)
     end
 
     # Test introduced in 0.6.7 to demonstrate that the bug had been fixed.
@@ -51,7 +51,7 @@ describe Monotonic::Timer do
         timer.start
         sleep 1
       end
-      expect(block_time.round).must_equal(1)
+      expect(block_time.to_duration.to_seconds.to_f.round).must_equal(1)
     end
   end
 
@@ -88,7 +88,7 @@ describe Monotonic::Timer do
         expect(timer.total_time.round).must_equal(0)
         sleep 1
       end
-      expect(time.round).must_equal(1)
+      expect(time.to_duration.to_seconds.to_f.round).must_equal(1)
       expect(timer.total_time.round).must_equal(1)
     end
 

@@ -2,6 +2,7 @@
 # Monotonic::Timer
 
 require 'duration.rb'
+require_relative './Measurement'
 
 module Monotonic
   class Timer
@@ -20,6 +21,10 @@ module Monotonic
     # rigidity: a method call would be a measurable part of what it measures.
     CLOCK = Process.const_get(CLOCK_NAMES.find{|name| Process.const_defined?(name)})
 
+    # How many measurements of nothing .floor takes, and which of them it keeps.
+    SAMPLES = 1_000
+    PERCENTILE = 0.95
+
     class << self
       def clock_name
         @clock_name ||= CLOCK_NAMES.find{|name| Process.const_defined?(name)}
@@ -35,6 +40,24 @@ module Monotonic
       # denominated in nanoseconds whether the clock affords them or not.
       def resolution
         Process.clock_getres(CLOCK, :nanosecond)
+      end
+
+      # What it costs to measure at all, in nanoseconds, measured by timing
+      # measurements of nothing.  The clock's tick is not the limit: two readings
+      # must be taken, and taking them takes time, so an interval near this
+      # figure is mostly the measuring.
+      #
+      # It is a floor and not an error bar.  The typical cost is a tick or two;
+      # the tail is unbounded and one-sided, since the scheduler may take the
+      # processor away between the two readings and no single measurement can
+      # detect that it did.  A high percentile is taken rather than a median, so
+      # that the ordinary case is covered rather than merely the best one.
+      # Repeat and take a robust statistic if the tail matters.
+      def floor
+        @floor ||= (
+          samples = SAMPLES.times.map{timer = new; timer.start; timer.stop; timer.total_nanoseconds}.sort
+          samples[(samples.length * PERCENTILE).to_i]
+        )
       end
     end # class << self
 
@@ -87,6 +110,22 @@ module Monotonic
       to_duration.to_seconds.to_f
     end
 
+    # The elapsed interval together with what it is worth.  Not memoized: a timer
+    # which has not been stopped is still running, and so is its measurement.
+    # The floor is handed over as a method rather than a figure, so that a caller
+    # which only ever wants a number never sets the thousand null measurements
+    # going.
+    def measurement(drift: nil)
+      Monotonic::Measurement.new(total_nanoseconds, floor: self.class.method(:floor), drift: drift)
+    end
+
+    def to_s
+      measurement.to_s
+    end
+
+    # A Monotonic::Measurement rather than a bare Float, so that what comes back
+    # says how much of itself is real.  #total_time and #total_nanoseconds are
+    # still there for a number.
     def time
       start
       begin
@@ -94,7 +133,7 @@ module Monotonic
       ensure
         stop
       end
-      total_time
+      measurement
     end
 
     private

@@ -37,6 +37,7 @@ Gem::Specification.new do |spec|
 
   spec.dependencies = [
     ['duration.rb', '>= 0.4.0'],
+    ['measurand', '>= 0.1.0'],
     'sys-uptime'
   ]
 

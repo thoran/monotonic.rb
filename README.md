@@ -35,6 +35,22 @@ timer.total_nanoseconds
 # => 2508000, upon a clock which ticks in whole microseconds
 ```
 
+A timed block hands back a `Monotonic::Measurement` rather than a bare number, so that what comes back says how much of itself is real. `Monotonic::Timer.floor` is what it costs to measure at all, taken by timing measurements of nothing, and the measurement shows only as many digits as that floor reaches — the doubt itself being [measurand](https://github.com/thoran/measurand)'s business, which combines an absolute floor with a relative drift in quadrature rather than by addition.
+
+```ruby
+Monotonic::Timer.floor
+# => 84
+measurement = Monotonic::Timer.time{sleep 0.001}
+measurement.to_s
+# => "1.26562 ms"
+measurement.uncertainty
+# => 84.0
+measurement.to_duration.to_microseconds.to_f
+# => 1265.625
+```
+
+Nothing is capped: a day resolved to a hundred nanoseconds prints every figure it has, the absurdity being the mismatch between what the instrument resolves and what was asked of it, which is better seen than rounded away. The floor is a floor and not an error bar — the tail is unbounded and one-sided, the scheduler being free to take the processor away between the two readings — so repeat and take a robust statistic where that matters.
+
 
 ## Installation
 
@@ -115,26 +131,26 @@ timer.total_time
 ```ruby
 require 'monotonic.rb'
 
-time = Monotonic::Timer.time do
+measurement = Monotonic::Timer.time do
   i = 0
   1_000_000.times{puts i += 1}
 end
-time
-# => 6.975823000073433
+measurement.to_s
+# => "6.97582 s"
 ```
 
 ### Monotonic::Timer with a block and block variable
 
 ```ruby
 require 'monotonic.rb'
-time = Monotonic::Timer.time do |timer|
+measurement = Monotonic::Timer.time do |timer|
   i = 0
   500_000.times{puts i += 1}
   p timer.total_time
   500_000.times{puts i += 1}
 end
-time
-# => 6.975823000073433
+measurement.to_s
+# => "6.97582 s"
 ```
 
 ### Monotonic::Timer with a block on a timer instance
@@ -142,12 +158,12 @@ time
 ```ruby
 require 'monotonic.rb'
 timer = Monotonic::Timer.new
-time = timer.time do
+measurement = timer.time do
   i = 0
   1_000_000.times{puts i += 1}
 end
-time
-# => 7.033131000120193
+measurement.to_s
+# => "7.03313 s"
 ```
 
 

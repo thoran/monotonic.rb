@@ -2,6 +2,26 @@
 
 ## 20260816
 
+0.9.0: Use measurand gem, + Monotonic::Measurement and Monotonic::Timer.floor.
+
+1. + measurand as a dependency, constrained to >= 0.1.0 where Measurand#place became public. How well a figure is known is its business, and it was being hand-rolled here: combining an absolute floor with a relative drift by addition gave 109.49ns where the correct combination in quadrature gives 87.78ns, a quarter out.
+2. + Monotonic::Timer.floor: what it costs to measure at all, in nanoseconds, measured by timing measurements of nothing and remembered. The clock's tick is not the limit, an interval wanting two readings and the taking of them taking time. A high percentile rather than a median, so that the ordinary case is covered and not merely the best one. It is a floor and not an error bar: the tail is unbounded and one-sided, the scheduler being free to take the processor away between the two readings, and no single measurement can detect that it did.
+3. + Monotonic::Measurement: an elapsed interval together with what it is worth. #to_s shows only as many digits as the uncertainty reaches, the least significant place being settled by Measurand#place upon the Particle Data Group convention, so 1265625ns against a floor of 84ns prints as 1.26562ms and the same count measured coarsely prints as 1.27ms. The unit ladder is powers of a thousand and stops at seconds, the scheme being a decimal-places one and minutes being sexagesimal. Nothing is capped, a day resolved to a hundred nanoseconds printing every figure it has: the absurdity is the mismatch between instrument and question, and is better seen than rounded away.
+4. + Monotonic::Measurement#uncertainty, #measurand, #unit_name, #decimals, #nanoseconds, #floor, #drift: every figure the rendering rests upon, so that a string can be walked back to the clock which produced it.
+5. + Monotonic::Measurement#floor takes a number or anything answering to #call, and Monotonic::Timer hands over its .floor method rather than its value. Measuring the floor is a thousand null measurements, and a caller which only wants a number should not set them going: a timed block costs 0.008ms where it would cost 0.307ms, the floor being measured when doubt is first asked about.
+6. + Monotonic::Measurement drift, optional and nil by default: the relative term, being the rate at which the clock's own oscillator wanders. It cannot be measured from within, weighing a clock wanting a better clock and this being the best one here, so it is supplied by a caller or not at all.
+7. + Monotonic::Measurement#to_i and #to_f, both in nanoseconds, its own unit, as Duration::Minutes answers 5 rather than 300; #to_duration for every other unit; and #<=> with Comparable, against another measurement only, a bare number having no unit to compare against.
+8. ~ BREAKING: Monotonic::Timer#time and .time return a Monotonic::Measurement rather than a Float of seconds. What comes back now says how much of itself is real, which a bare Float could not: 0.001295791 shows nine figures upon an instrument which resolves five. #total_time and #total_nanoseconds are unchanged for a number.
+9. + Monotonic::Timer#measurement and #to_s.
+10. + test/Monotonic/Measurement_test.rb: the unit chosen, the digits allowed, the uncertainty and that it combines in quadrature, the comparison, the conversions, the lazy floor, and that every figure the rendering rests upon is reachable.
+11. + test/Monotonic/Timer_test.rb: the floor, and that a timed block returns a measurement which carries the interval and the floor.
+12. ~ test/gemspec_test.rb: the runtime dependency list.
+13. ~ README.md: + the floor and the measurement, and what a timed block now hands back.
+14. ~ Monotonic::VERSION: /0.8.0/0.9.0/
+
+
+## 20260816
+
 0.8.0: Use duration.rb gem.
 
 1. + duration.rb as a dependency, constrained to >= 0.4.0 where sys-uptime is unconstrained. Units and the arithmetic between them are its business, and were being hand-rolled here. 0.4.0 is where Duration::Nanoseconds arrived, which this gem names, and is the true minimum rather than a guess: the whole API used here exercises clean against it, and everything between is additive.

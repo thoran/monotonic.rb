@@ -19,7 +19,7 @@ describe 'monotonic.rb.gemspec' do
   end
 
   it "declares its runtime dependencies" do
-    _(spec.runtime_dependencies.map(&:name).sort).must_equal(%w{duration.rb sys-uptime})
+    _(spec.runtime_dependencies.map(&:name).sort).must_equal(%w{duration.rb measurand sys-uptime})
   end
 
   it "declares its development dependencies" do
