@@ -23,6 +23,16 @@ module Monotonic
     # not divide by ten.
     UNITS = [[1, 'ns'], [1_000, 'us'], [1_000_000, 'ms'], [1_000_000_000, 's']]
 
+    class << self
+      # Built from a measurand rather than from a floor, for what comes back
+      # from arithmetic: its uncertainty has been propagated rather than
+      # measured, so it is neither an instrument's floor nor has a drift left to
+      # apply a second time.
+      def from(measurand)
+        allocate.tap{|measurement| measurement.send(:build, measurand)}
+      end
+    end # class << self
+
     attr_reader :nanoseconds
     attr_reader :drift
 
@@ -49,6 +59,35 @@ module Monotonic
 
     def uncertainty
       measurand.uncertainty
+    end
+
+    # The arithmetic is Measurand's throughout — this only decides what may be
+    # combined with what, and hands back the right kind of thing.  Two intervals
+    # add and subtract to an interval, their uncertainties going in quadrature.
+    def +(addend)
+      self.class.from(measurand + as_measurand(addend, :add))
+    end
+
+    def -(subtrahend)
+      self.class.from(measurand - as_measurand(subtrahend, :subtract))
+    end
+
+    # Scaled by a number it stays an interval, the uncertainty scaling with it.
+    # Multiplied by another interval it would be time squared, which has no unit
+    # here, so it is refused as Duration::Common refuses it.
+    def *(multiplier)
+      if interval?(multiplier)
+        raise TypeError, "can't multiply #{self.class} by #{multiplier.class}: there is no unit of time squared"
+      end
+      self.class.from(measurand * multiplier)
+    end
+
+    # Divided by a number it stays an interval.  Divided by another interval the
+    # units cancel and a Measurand is left — dimensionless, but still knowing how
+    # well it is known, which is what a speedup or a rate is.
+    def /(divisor)
+      return measurand / divisor.measurand if divisor.respond_to?(:measurand)
+      self.class.from(measurand / divisor)
     end
 
     def unit
@@ -113,6 +152,25 @@ module Monotonic
       @nanoseconds = nanoseconds
       @floor = floor
       @drift = drift
+    end
+
+    # An interval is anything which knows its own doubt, or any duration, which
+    # is exact.  A bare number is neither: it has no unit, so there is nothing to
+    # add it to.
+    def as_measurand(other, verb)
+      return other.measurand if other.respond_to?(:measurand)
+      return Measurand.new(other.to_nanoseconds.to_i) if other.respond_to?(:to_nanoseconds)
+      raise TypeError, "can't #{verb} #{other.class} #{verb == :add ? "to" : "from"} #{self.class}: expected an interval or a duration"
+    end
+
+    def interval?(other)
+      other.respond_to?(:measurand) || other.respond_to?(:to_nanoseconds)
+    end
+
+    def build(measurand)
+      @nanoseconds = measurand.value.round
+      @measurand = measurand
+      @floor = measurand.uncertainty
     end
   end
 end

@@ -51,6 +51,15 @@ measurement.to_duration.to_microseconds.to_f
 
 Nothing is capped: a day resolved to a hundred nanoseconds prints every figure it has, the absurdity being the mismatch between what the instrument resolves and what was asked of it, which is better seen than rounded away. The floor is a floor and not an error bar — the tail is unbounded and one-sided, the scheduler being free to take the processor away between the two readings — so repeat and take a robust statistic where that matters.
 
+Measurements combine, and what may combine with what follows from the units. Two intervals add and subtract to an interval, their doubts going in quadrature; a duration joins in as exact, having none of its own; a bare number is refused, having no unit to be added to. Scaling by a number keeps the unit and scales the doubt with it, while multiplying two intervals is refused, there being no unit of time squared. Dividing one interval by another cancels the units and leaves a `Measurand` — dimensionless, and still knowing how well it is known, which is what a speedup is.
+
+```ruby
+serial = Monotonic::Timer.time{run_on_one}
+parallel = Monotonic::Timer.time{run_on_eight}
+serial / parallel
+# => Measurand(6.83, 0.00012), dimensionless
+```
+
 
 ## Installation
 
@@ -143,6 +152,7 @@ measurement.to_s
 
 ```ruby
 require 'monotonic.rb'
+
 measurement = Monotonic::Timer.time do |timer|
   i = 0
   500_000.times{puts i += 1}
@@ -157,6 +167,7 @@ measurement.to_s
 
 ```ruby
 require 'monotonic.rb'
+
 timer = Monotonic::Timer.new
 measurement = timer.time do
   i = 0
@@ -164,6 +175,34 @@ measurement = timer.time do
 end
 measurement.to_s
 # => "7.03313 s"
+```
+
+
+### Monotonic::Measurement arithmetic
+
+```ruby
+require 'monotonic.rb'
+
+a = Monotonic::Timer.time{sleep 0.001}
+b = Monotonic::Timer.time{sleep 0.002}
+
+(a + b).to_s
+# => "3.01543 ms"
+
+(a * 3).to_s
+# => "3.04629 ms"
+
+a + Duration::Microseconds.new(500)
+# => #<Monotonic::Measurement 1.51543 ms>, a duration being exact
+
+b / a
+# => Measurand(1.97, 0.00011), dimensionless
+
+a * b
+# => TypeError: there is no unit of time squared
+
+a + 5
+# => TypeError: expected an interval or a duration
 ```
 
 

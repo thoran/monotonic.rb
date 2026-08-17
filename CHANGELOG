@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## 20260817
+
+0.10.0: + Monotonic::Measurement arithmetic, so that a speedup is a ratio which knows how well it is known.
+
+1. + Monotonic::Measurement#+ and #-: two intervals give an interval, their doubts combining in quadrature through Measurand rather than by addition. A duration joins as exact, having none of its own, and a bare number is refused, having no unit to be added to.
+2. + Monotonic::Measurement#*: scales by a number, the uncertainty scaling with it. Two intervals are refused, there being no unit of time squared, as Duration::Common refuses them.
+3. + Monotonic::Measurement#/: by a number it stays an interval; by another interval the units cancel and a Measurand is left, dimensionless and carrying the doubt of both. That ratio is t1/tn, and the reason for the release: a speedup stated without knowing whether it is real is worth little.
+4. + Monotonic::Measurement.from: builds from a measurand whose uncertainty has been propagated rather than measured, so that what comes back from arithmetic carries neither an instrument's floor nor a drift still to be applied a second time.
+5. ~ monotonic.rb.gemspec: /measurand >= 0.1.0/measurand >= 0.1.2/. Measurand#/ divided two integer values as integers until 0.1.2, so a ratio of two nanosecond counts came back as 0 rather than 0.8788. #/ is the point of this release and does not work below 0.1.2, which the added tests demonstrate: they fail twice against 0.1.0 and pass against 0.1.2.
+6. + test/Monotonic/Measurement_test.rb: each operator and what it refuses, and the ratio — that it is dimensionless, that it divides exactly, and that it carries the doubt of both operands.
+7. + test/gemspec_test.rb: that each runtime dependency declares a minimum, and which minimum. The existing test asserted the names alone, which is what let 5 above happen: the gemspec named measurand and said nothing about needing a measurand that works. Asserting the whole map means a minimum cannot move without the test being made to agree.
+8. ~ README.md: + the arithmetic to the Description, + a Monotonic::Measurement arithmetic section to Usage, and + a blank line after require in two examples, the other three having had one.
+9. ~ Monotonic::VERSION: /0.9.0/0.10.0/
+
+
 ## 20260816
 
 0.9.0: Use measurand gem, + Monotonic::Measurement and Monotonic::Timer.floor.

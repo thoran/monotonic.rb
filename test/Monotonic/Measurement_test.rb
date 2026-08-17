@@ -96,6 +96,67 @@ describe Monotonic::Measurement do
     end
   end
 
+  describe "arithmetic" do
+    it "adds two intervals to an interval, the doubt going in quadrature" do
+      sum = measurement(1_000_000) + measurement(2_000_000)
+      _(sum).must_be_instance_of(Monotonic::Measurement)
+      _(sum.nanoseconds).must_equal(3_000_000)
+      _(sum.uncertainty).must_be_close_to(Math.sqrt(84**2 + 84**2), 0.0001)
+    end
+
+    it "subtracts likewise, the doubt growing rather than cancelling" do
+      difference = measurement(2_000_000) - measurement(1_000_000)
+      _(difference.nanoseconds).must_equal(1_000_000)
+      _(difference.uncertainty).must_be_close_to(Math.sqrt(84**2 + 84**2), 0.0001)
+    end
+
+    it "takes a duration as exact, it having no doubt of its own" do
+      sum = measurement(1_000_000) + Duration::Microseconds.new(500)
+      _(sum.nanoseconds).must_equal(1_500_000)
+      _(sum.uncertainty).must_equal(84)
+    end
+
+    it "refuses a bare number, which has no unit to add" do
+      _{measurement(1_000_000) + 5}.must_raise(TypeError)
+      _{measurement(1_000_000) - 5}.must_raise(TypeError)
+    end
+
+    it "scales by a number, the uncertainty scaling with it" do
+      product = measurement(1_000_000) * 3
+      _(product.nanoseconds).must_equal(3_000_000)
+      _(product.uncertainty).must_equal(252)
+    end
+
+    it "refuses to multiply two intervals, there being no unit of time squared" do
+      _{measurement(1_000_000) * measurement(2_000_000)}.must_raise(TypeError)
+      _{measurement(1_000_000) * Duration::Seconds.new(1)}.must_raise(TypeError)
+    end
+
+    it "divides by a number and stays an interval" do
+      quotient = measurement(1_000_000) / 2
+      _(quotient).must_be_instance_of(Monotonic::Measurement)
+      _(quotient.nanoseconds).must_equal(500_000)
+      _(quotient.uncertainty).must_equal(42)
+    end
+  end
+
+  describe "the ratio of two intervals" do
+    it "is dimensionless, the units having cancelled" do
+      ratio = measurement(9_579_583) / measurement(10_900_458)
+      _(ratio).must_be_instance_of(Measurand)
+      _(ratio.value.to_f).must_be_close_to(0.878824, 0.000001)
+    end
+
+    it "divides exactly rather than as integers, which measurand 0.1.2 settled" do
+      _((measurement(1_000_000) / measurement(3_000_000)).value).must_equal(Rational(1, 3))
+    end
+
+    it "carries the doubt of both, which is what a speedup is worth knowing" do
+      ratio = measurement(9_579_583) / measurement(10_900_458)
+      _(ratio.uncertainty).must_be_close_to(1.026e-05, 1e-8)
+    end
+  end
+
   describe "#to_duration" do
     it "hands the interval to duration.rb, whose business the units are" do
       _(measurement(1_500_000_000).to_duration).must_be_instance_of(Duration::Nanoseconds)
