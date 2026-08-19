@@ -26,13 +26,13 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = '>= 2.5'
 
   spec.files = [
+    Dir['lib/**/*.rb'],
+    Dir['test/**/*.rb'],
     'CHANGELOG',
     'Gemfile',
-    Dir['lib/**/*.rb'],
     'monotonic.rb.gemspec',
     'Rakefile',
     'README.md',
-    Dir['test/**/*.rb'],
   ].flatten
 
   spec.dependencies = [
